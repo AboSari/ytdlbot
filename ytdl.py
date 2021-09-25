@@ -23,6 +23,7 @@ from tgbot_ping import get_runtime
 from config import APP_HASH, APP_ID, ENABLE_VIP, OWNER, TOKEN, WORKERS
 from constant import BotText
 from downloader import convert_flac, sizeof_fmt, upload_hook, ytdl_download
+from helper import extract_url
 from limit import Redis, verify_payment
 from utils import customize_logger
 
@@ -121,9 +122,10 @@ def download_handler(client: "Client", message: "types.Message"):
         return
 
     url = re.sub(r'/ytdl\s*', '', message.text)
+    url = extract_url(url)
     logging.info("start %s", url)
 
-    if not re.findall(r"^https?://", url.lower()):
+    if not url:  # re.findall(r"^https?://", url.lower())
         Redis().update_metrics("bad_request")
         message.reply_text("I think you should send me a link.", quote=True)
         return
@@ -136,16 +138,16 @@ def download_handler(client: "Client", message: "types.Message"):
     result = ytdl_download(url, temp_dir.name, bot_msg)
     logging.info("Download complete.")
 
-    markup = InlineKeyboardMarkup(
-        [
-            [  # First row
-                InlineKeyboardButton(  # Generates a callback query when pressed
-                    "audio",
-                    callback_data="audio"
-                )
-            ]
-        ]
-    )
+    # markup = InlineKeyboardMarkup(
+    #     [
+    #         [  # First row
+    #             InlineKeyboardButton(  # Generates a callback query when pressed
+    #                 "audio",
+    #                 callback_data="audio"
+    #             )
+    #         ]
+    #     ]
+    # )
 
     if result["status"]:
         client.send_chat_action(chat_id, 'upload_document')
@@ -160,7 +162,7 @@ def download_handler(client: "Client", message: "types.Message"):
                               supports_streaming=True,
                               caption=f"`{filename}`\n\n{url}\n\nsize: {size}\n\n{remain}",
                               progress=upload_hook, progress_args=(bot_msg,),
-                              reply_markup=markup,
+                              # reply_markup=markup,
                               **meta
                               )
             Redis().update_metrics("video_success")

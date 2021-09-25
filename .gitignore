@@ -141,3 +141,4 @@ dmypy.json
 /.idea/dataSources.xml
 /.idea/sqldialects.xml
 /.idea/.gitignore
+/.idea/encodings.xml
