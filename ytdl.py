@@ -160,7 +160,7 @@ def download_handler(client: "Client", message: "types.Message"):
             meta = get_metadata(video_path)
             client.send_video(chat_id, video_path,
                               supports_streaming=True,
-                              caption=f"`{filename}`\n\n{url}\n\nsize: {size}\n\n{remain}",
+                              caption=f"`{filename}`\n\nsize: {size}\n\n{remain}",
                               progress=upload_hook, progress_args=(bot_msg,),
                               # reply_markup=markup,
                               **meta
