@@ -110,7 +110,8 @@ def ytdl_download(url, tempdir, bm) -> dict:
         'progress_hooks': [lambda d: download_hook(d, bm)],
         'outtmpl': output,
         'restrictfilenames': False,
-        'quiet': True
+        'quiet': True,
+        'cookiefile': 'cookies/reddit.com_cookies.txt'
     }
     formats = [
         "bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio",
