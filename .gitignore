@@ -160,3 +160,4 @@ data/*
 upgrade_worker.sh
 ytdl.session
 reinforcement/*
+/.idea/encodings.xml
