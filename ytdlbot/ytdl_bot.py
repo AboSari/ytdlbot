@@ -35,6 +35,8 @@ from tasks import (audio_entrance, direct_download_entrance, hot_patch,
 from utils import (auto_restart, customize_logger, get_revision,
                    get_user_settings, set_user_settings)
 
+from tools.helper import extract_url
+
 customize_logger(["pyrogram.client", "pyrogram.session.session", "pyrogram.connection.connection"])
 logging.getLogger('apscheduler.executors.default').propagate = False
 
@@ -265,9 +267,10 @@ def download_handler(client: "Client", message: "types.Message"):
     red.user_count(chat_id)
 
     url = re.sub(r'/ytdl\s*', '', message.text)
+    url = extract_url(url)
     logging.info("start %s", url)
 
-    if not re.findall(r"^https?://", url.lower()):
+    if not url:  # re.findall(r"^https?://", url.lower())
         red.update_metrics("bad_request")
         message.reply_text("I think you should send me a link.", quote=True)
         return
