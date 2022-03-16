@@ -274,6 +274,9 @@ def download_handler(client: "Client", message: "types.Message"):
             and get_hostname(url) not in ['youtube.com', 'youtu.be', 'reddit.com', 'instagram.com']:
         return
 
+    if get_hostname(url) == 'instagram.com' and '/p/' in url:
+        return
+
     logging.info("start %s", url)
 
     # check remaining quota

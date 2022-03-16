@@ -17,4 +17,4 @@ def extract_url(text):
 
 def get_hostname(url):
     parsed_uri = urlparse(url)
-    return '{uri.netloc}'.format(uri=parsed_uri)
+    return ('{uri.netloc}'.format(uri=parsed_uri)).replace('www.', '')
