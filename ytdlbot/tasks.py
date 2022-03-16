@@ -320,12 +320,7 @@ def gen_cap(bm, url, video_path):
     if user is None:
         user_info = ""
     else:
-        user_info = "@{}({})-{}".format(
-            user.username or "N/A",
-            user.first_name or "" + user.last_name or "",
-            user.id
-        )
-
+        user_info = f'@{user.username}({user.first_name})'
     if isinstance(video_path, pathlib.Path):
         meta = get_metadata(video_path)
         file_name = video_path.name
@@ -341,8 +336,8 @@ def gen_cap(bm, url, video_path):
         )
     remain = bot_text.remaining_quota_caption(chat_id)
     worker = get_dl_source()
-    cap = f"{user_info}\n`{file_name}`\n\n{url}\n\nInfo: {meta['width']}x{meta['height']} {file_size}\t" \
-          f"{meta['duration']}s\n{remain}\n{worker}\n{bot_text.custom_text}"
+    cap = f"{user_info}\n`{file_name}`\n\nInfo: {file_size}\t" \
+          f"({meta['duration']}s)\n{remain}\n{worker}\n{bot_text.custom_text}"
     return cap, meta
 
 

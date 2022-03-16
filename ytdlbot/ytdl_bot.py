@@ -35,7 +35,7 @@ from tasks import (audio_entrance, direct_download_entrance, hot_patch,
 from utils import (auto_restart, customize_logger, get_revision,
                    get_user_settings, set_user_settings)
 
-from tools.helper import extract_url
+from tools.helper import extract_url, get_hostname
 
 customize_logger(["pyrogram.client", "pyrogram.session.session", "pyrogram.connection.connection"])
 logging.getLogger('apscheduler.executors.default').propagate = False
@@ -258,22 +258,29 @@ def vip_handler(client: "Client", message: "types.Message"):
 
 
 @app.on_message(filters.incoming & filters.text)
-@private_use
+# @private_use
 def download_handler(client: "Client", message: "types.Message"):
+    # check it's an URL
+    # url = re.sub(r'/ytdl\s*', '', message.text)
+    url = extract_url(message.text)
+
+    if not url:  # re.findall(r"^https?://", url.lower())
+        # red.update_metrics("bad_request")
+        if message.chat.type == "private":
+            message.reply_text("I think you should send me a link.", quote=True)
+        return
+
+    if message.chat.type != "private" \
+            and get_hostname(url) not in ['youtube.com', 'youtu.be', 'reddit.com', 'instagram.com']:
+        return
+
+    logging.info("start %s", url)
+
     # check remaining quota
     red = Redis()
     chat_id = message.from_user.id
     client.send_chat_action(chat_id, 'typing')
     red.user_count(chat_id)
-
-    url = re.sub(r'/ytdl\s*', '', message.text)
-    url = extract_url(url)
-    logging.info("start %s", url)
-
-    if not url:  # re.findall(r"^https?://", url.lower())
-        red.update_metrics("bad_request")
-        message.reply_text("I think you should send me a link.", quote=True)
-        return
 
     if re.findall(r"^https://www\.youtube\.com/channel/", VIP.extract_canonical_link(url)):
         message.reply_text("Channel download is disabled now. Please send me individual video link.", quote=True)
